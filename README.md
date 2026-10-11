@@ -1,7 +1,7 @@
 # ML_PROJECT_CVD
 CLASS PROJECT 1 - ML COURSE @EPFL
 
-### run.py
+### implementations.py
 | Function | Details |
 |---|---|
 | `mean_squared_error_gd(y, tx, initial_w, max_iters, gamma)` | Linear regression using gradient descent |
