@@ -4,7 +4,7 @@ import numpy as np
 def calculate_mse(y, tx, w):
     """Calculate the mean squared error."""
     e = y - tx.dot(w)
-    return 1 / 2 * np.mean(e**2)
+    return 1 / 2 * np.mean(e ** 2)
 
 
 def compute_gradient(y, tx, w):
@@ -70,7 +70,7 @@ def ridge_regression(y, tx, lambda_):
 def sigmoid(t):
     """ Compute output of logistic (sigmoid) function on t. """
     # (1 + e^-x)^-1
-    sigma = (1 / 1 + np.exp(-t))**-1
+    sigma = (1 / 1 + np.exp(-t)) ** -1
     return sigma
 
 
@@ -99,8 +99,8 @@ def learning_by_gradient_descent(y, tx, w, gamma, reg=False, lambda_=0):
     gradient = calculate_neg_ll_gradient(y, tx, w)
     # reg argument indicates whether to use regularization
     if reg:  # yes, regularize
-        gradient += (2 * lambda_ * w)
-    w -= (gamma * gradient)
+        gradient += 2 * lambda_ * w
+    w -= gamma * gradient
     # TODO verify: compute loss after updating w? Tests fail otherwise.
     loss = calculate_neg_ll_loss(y, tx, w)
     return w, loss
@@ -110,7 +110,9 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     """ Perform logistic regression using gradient descent.
         No regularization on this version. """
     w = initial_w
-    loss = calculate_neg_ll_loss(y, tx, initial_w)  # initial loss before gradient descent
+    loss = calculate_neg_ll_loss(
+        y, tx, initial_w
+    )  # initial loss before gradient descent
     # iterative logistic regression by gradient descent
     for _ in range(max_iters):
         # get loss and update weights w
@@ -123,11 +125,15 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     """ Perform logistic regression using gradient descent, with regularization term
         to help avoid overfitting. """
     w = initial_w
-    loss = calculate_neg_ll_loss(y, tx, initial_w)  # initial loss before gradient descent
+    loss = calculate_neg_ll_loss(
+        y, tx, initial_w
+    )  # initial loss before gradient descent
     # iterative logistic regression by gradient descent
     for _ in range(max_iters):
         # get loss and update weights w
         # per project instructions, penalty term NOT included in loss calculation
-        w, loss = learning_by_gradient_descent(y, tx, w, gamma, reg=True, lambda_=lambda_)
+        w, loss = learning_by_gradient_descent(
+            y, tx, w, gamma, reg=True, lambda_=lambda_
+        )
     w = w.flatten()
     return w, loss
