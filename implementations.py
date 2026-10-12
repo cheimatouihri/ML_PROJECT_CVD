@@ -81,7 +81,7 @@ def calculate_neg_ll_loss(y, tx, w):
     neg_ll = np.multiply(y, np.log(sigma)) + np.multiply(1 - y, np.log(1 - sigma))
     # take average and make negative
     neg_ll = np.mean(neg_ll) * -1
-    return neg_ll.item()
+    return neg_ll
 
 
 def calculate_neg_ll_gradient(y, tx, w):
@@ -97,11 +97,12 @@ def calculate_neg_ll_gradient(y, tx, w):
 def learning_by_gradient_descent(y, tx, w, gamma, reg=False, lambda_=0):
     """ Do one step of gradient descent using logistic regression. Return the loss and the updated w. """
     gradient = calculate_neg_ll_gradient(y, tx, w)
-    loss = calculate_neg_ll_loss(y, tx, w)
     # reg argument indicates whether to use regularization
     if reg:  # yes, regularize
         gradient += (2 * lambda_ * w)
     w -= (gamma * gradient)
+    # TODO verify: compute loss after updating w? Tests fail otherwise.
+    loss = calculate_neg_ll_loss(y, tx, w)
     return w, loss
 
 
@@ -109,10 +110,12 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     """ Perform logistic regression using gradient descent.
         No regularization on this version. """
     w = initial_w
+    loss = calculate_neg_ll_loss(y, tx, initial_w)  # initial loss before gradient descent
     # iterative logistic regression by gradient descent
     for _ in range(max_iters):
         # get loss and update weights w
         w, loss = learning_by_gradient_descent(y, tx, w, gamma)
+    w = w.flatten()
     return w, loss
 
 
@@ -120,9 +123,11 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     """ Perform logistic regression using gradient descent, with regularization term
         to help avoid overfitting. """
     w = initial_w
+    loss = calculate_neg_ll_loss(y, tx, initial_w)  # initial loss before gradient descent
     # iterative logistic regression by gradient descent
     for _ in range(max_iters):
         # get loss and update weights w
         # per project instructions, penalty term NOT included in loss calculation
         w, loss = learning_by_gradient_descent(y, tx, w, gamma, reg=True, lambda_=lambda_)
+    w = w.flatten()
     return w, loss
