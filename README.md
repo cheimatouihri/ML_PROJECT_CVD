@@ -1,8 +1,6 @@
 # ML_PROJECT_CVD
 CLASS PROJECT 1 - ML COURSE @EPFL
 
-Put `x_train.csv`, `y_train.csv` and `x_test.csv` in `data/`.
-
 ### implementations.py
 | Function | Details |
 |---|---|
