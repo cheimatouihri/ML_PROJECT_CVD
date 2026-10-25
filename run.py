@@ -9,11 +9,11 @@ from utils import (
 )
 
 # parameters chosen by cross-validation
-MODEL = "reg logistic"  
-LAMBDA = 1e-4  
-POS_WEIGHT = 1  # weight of positive samples
-THRESHOLD = 0.0 
-MAX_ITERS = 500  
+MODEL = "weighted reg logistic"
+LAMBDA = 0.0001
+POS_WEIGHT = 2
+THRESHOLD = -0.721576
+MAX_ITERS = 1000  
 OUTPUT = "submission.csv"
 
 tx_train, tx_test, y_train, test_ids, _ = load_preprocess(use_cache=False)
@@ -31,7 +31,7 @@ else:
     else:
         raise ValueError(f"unknown MODEL {MODEL!r}")
 
-pred = predict(tx_test @ w, THRESHOLD)  # labels -1/1, as required for the submission
+pred = predict(tx_test @ w, THRESHOLD)  
 create_csv_submission(test_ids, pred, OUTPUT)
 print(f"{MODEL} (lambda={LAMBDA}, pos_weight={POS_WEIGHT}, threshold={THRESHOLD})")
 print(

@@ -105,7 +105,7 @@ def learning_by_gradient_descent(y, tx, w, gamma, reg=False, lambda_=0):
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
     """ Perform logistic regression using gradient descent.
         No regularization on this version. """
-    w = initial_w
+    w = np.array(initial_w, dtype=float) 
     loss = calculate_neg_ll_loss(
         y, tx, initial_w
     )  # initial loss before gradient descent
@@ -120,8 +120,8 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     """ Perform logistic regression using gradient descent, with regularization term
         to help avoid overfitting. """
-    print(np.unique(y))
-    w = initial_w
+    #print(np.unique(y))
+    w = np.array(initial_w, dtype=float) 
     loss = calculate_neg_ll_loss(
         y, tx, initial_w
     )  # initial loss before gradient descent
