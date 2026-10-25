@@ -6,6 +6,7 @@ Inspect some columns:  python explore.py GENHLTH _AGEG5YR DIABETE3
 import sys
 import numpy as np
 from helpers import load_csv_data
+from preprocessing import preprocess 
 
 DATA = "data"
 KEY_VARS = ["_AGEG5YR", "SEX", "GENHLTH", "BPHIGH4", "TOLDHI2", "DIABETE3",
@@ -67,13 +68,11 @@ def correlation_with_label(x, feature_names, top=20):
         print(f"  {name:<24} r={r:+.3f}   present={coverage:.0%}")
 
 
-# ---------- inspect specific columns only ----------
 if len(sys.argv) > 1:
     for name in sys.argv[1:]:
         describe(name) if name in col else print(f"\n{name}: not a column")
     sys.exit()
 
-# ---------- 1. shapes and labels ----------
 section("Shapes and labels")
 print(f"x_train {x_train.shape}   x_test {x_test.shape}   {len(names)} feature names")
 assert x_train.shape[1] == len(names) == x_test.shape[1], "names don't line up with columns"
@@ -81,7 +80,7 @@ labels, counts = np.unique(y_train, return_counts=True)
 print("labels:", dict(zip(labels.tolist(), counts.tolist())), f"-> positive rate {pos.mean():.2%}")
 print(f"accuracy of always predicting 'no CVD': {1 - pos.mean():.2%}  (why accuracy is a bad metric here)")
 
-# ---------- 2. missingness ----------
+# missing
 section("Missing values per column")
 miss_tr, miss_te = np.isnan(x_train).mean(axis=0), np.isnan(x_test).mean(axis=0)
 buckets = [("none", miss_tr == 0), ("<=5%", (miss_tr > 0) & (miss_tr <= 0.05)),
@@ -93,13 +92,13 @@ print("biggest train/test missingness gaps (should all be small):")
 for i in np.argsort(-np.abs(miss_tr - miss_te))[:5]:
     print(f"  {names[i]:<12} train {miss_tr[i]:6.1%}   test {miss_te[i]:6.1%}")
 
-# ---------- 3. survey codes ----------
+# survey codes
 section("Survey codes in the raw data")
 for code in [77, 88, 99, 777, 888, 999, 7777, 9999]:
     hits = [names[i] for i in range(len(names)) if np.any(x_train[:, i] == code)]
     print(f"  {code:>5}: {len(hits):>3} columns, e.g. {', '.join(hits[:6])}")
 
-# ---------- 4. leakage ----------
+# leakage
 section("Leak check: is missingness itself predictive?")
 rows = [missing_vs_label(n) for n in names if 0.001 < miss_tr[col[n]] < 0.999]
 rows.sort(key=lambda r: -abs(r[2] - r[3]))
@@ -108,24 +107,16 @@ print_missing_rows(rows[:15])
 print("\nknown suspects (CVD rate near 100% when present = leak):")
 print_missing_rows([missing_vs_label(n) for n in LEAK_SUSPECTS if n in col])
 
-# ---------- 5. key variables ----------
+# key variables
 section("Key variables: value counts and CVD rate per value")
 for name in KEY_VARS:
     if name in col:
         describe(name)
 
-# ---------- 6. rough univariate signal ----------
 section("Raw columns most correlated with the label (codes not cleaned, rough)")
 correlation_with_label(x_train, names)
 
-# ---------- 7. after preprocessing ----------
-section("After preprocessing")
-try:
-    from preprocessing import preprocess  # change to the name of your teammate's file
-except ImportError:
-    print("  couldn't import preprocess: set the module name in section 7")
-    sys.exit()
-
+# preprocessing
 tx_tr, tx_te, feats = preprocess(x_train, x_test, names)
 print(f"train {tx_tr.shape}   test {tx_te.shape}   {len(feats)} feature names")
 print("NaN:", int(np.isnan(tx_tr).sum() + np.isnan(tx_te).sum()),
