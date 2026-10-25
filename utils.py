@@ -89,3 +89,26 @@ def weighted_reg_logistic_regression(
         gradient = tx.T @ (c * (sigmoid(tx @ w) - y)) / len(y) + 2 * lambda_ * w
         w = w - gamma * gradient
     return w
+
+def add_powers(tx_tr, features, degree, tx_te=None):
+    """Polynomial feature expansion (as build_poly in lab 4), only for non-binary columns.
+
+    Adds x^2, ..., x^degree for every column with more than 2 distinct values (numeric and
+    ordinal features). 0/1 columns (one-hot, missing indicators) are skipped, since x^p = x.
+    Each new column is standardized with the mean / std of the training data.
+
+    Returns:
+        tx_tr_poly, tx_te_poly (None if tx_te is None), new feature names
+    """
+    cols = [j for j in range(1, tx_tr.shape[1]) if len(np.unique(tx_tr[:, j])) > 2]
+    parts_tr, parts_te, names = [tx_tr], [tx_te], list(features)
+    for p in range(2, degree + 1):
+        power_tr = tx_tr[:, cols] ** p
+        mean, std = power_tr.mean(axis=0), power_tr.std(axis=0)
+        std[std == 0] = 1
+        parts_tr.append((power_tr - mean) / std)
+        if tx_te is not None:
+            parts_te.append((tx_te[:, cols] ** p - mean) / std)
+        names += [f"{features[j]}^{p}" for j in cols]
+    tx_te_poly = np.hstack(parts_te) if tx_te is not None else None
+    return np.hstack(parts_tr), tx_te_poly, names
