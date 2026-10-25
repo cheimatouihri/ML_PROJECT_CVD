@@ -27,9 +27,7 @@ else:
     if MODEL == "reg logistic":
         w, _ = reg_logistic_regression(y01, tx_train, LAMBDA, w0, MAX_ITERS, gamma)
     elif MODEL == "weighted reg logistic":
-        w = weighted_reg_logistic_regression(
-            y01, tx_train, LAMBDA, w0, MAX_ITERS, gamma, POS_WEIGHT
-        )
+        w = weighted_reg_logistic_regression(y01, tx_train, LAMBDA, w0, MAX_ITERS, gamma, POS_WEIGHT)
     else:
         raise ValueError(f"unknown MODEL {MODEL!r}")
 
