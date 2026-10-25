@@ -5,14 +5,15 @@ TO_REMOVE = ["FMONTH", "IDATE", "IMONTH", "IDAY", "IYEAR", "SEQNO", "_PSU",
              "_STSTR", "_STRWT", "_RAWRAKE", "_WT2RAKE", "_CLLCPWT", "_DUALCOR", "_LLCPWT",
              "WEIGHT2", "HEIGHT3", "ALCDAY5", "FRUITJU1", "FRUIT1", "FVBEANS", "FVGREEN",
              "FVORANG", "VEGETAB1", "EXEROFT1", "EXERHMM1", "EXEROFT2", "EXERHMM2", "STRENGTH",
-             "FLSHTMY2", "HIVTSTD3", "EXRACT11", "EXRACT21"]
+             "FLSHTMY2", "HIVTSTD3", "EXRACT11", "EXRACT21", "HAREHAB1"]
 
 # codes that are not 7/9 and represent unknown value
 EXTRA_CODES = {"_AGEG5YR": [14], "_AGE65YR": [3], "DROCDY3_": [900], "_DRNKWEK": [99900],
                "MAXVO2_": [999], "FC60_": [999]}
 
 # categories without order
-NOMINAL = ["_STATE", "MARITAL", "EMPLOY1", "RENTHOM1", "_RACE", "_PRACE1", "_MRACE1"]
+NOMINAL = ["_STATE", "MARITAL", "EMPLOY1", "RENTHOM1", "_RACE", "_PRACE1", "_MRACE1",
+           "DIABETE3", "BPHIGH4"] # we add these maybe?
 
 def preprocess(x_train, x_test, names, max_missing=0.8, max_corr=0.9, indicators=True, clip=5):
     x_tr, x_te = x_train.copy(), x_test.copy()

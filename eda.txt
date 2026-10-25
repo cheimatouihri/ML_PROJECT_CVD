@@ -1,0 +1,202 @@
+============ Shapes and labels ============
+x_train (328135, 321)   x_test (109379, 321)   321 feature names
+labels: {-1: 299160, 1: 28975} -> positive rate 8.83%
+accuracy of always predicting 'no CVD': 91.17%  (why accuracy is a bad metric here)
+
+============ Missing values per column ============
+     none:  82 columns
+     <=5%:  33 columns
+    5-50%:  59 columns
+   50-80%:  31 columns
+     >80%: 116 columns
+biggest train/test missingness gaps (should all be small):
+  HHADULT      train  58.7%   test  59.1%
+  NUMWOMEN     train  42.5%   test  42.2%
+  NUMMEN       train  42.5%   test  42.2%
+  CELLFON3     train  42.5%   test  42.1%
+  CSTATE       train  57.5%   test  57.9%
+
+============ Survey codes in the raw data ============
+     77:  53 columns, e.g. HHADULT, PHYSHLTH, MENTHLTH, POORHLTH, DIABAGE2, CHILDREN
+     88:  36 columns, e.g. PHYSHLTH, MENTHLTH, POORHLTH, DIABAGE2, CHILDREN, WEIGHT2
+     99:  60 columns, e.g. HHADULT, PHYSHLTH, MENTHLTH, POORHLTH, DIABAGE2, CHILDREN
+    777:  19 columns, e.g. WEIGHT2, ALCDAY5, FRUITJU1, FRUIT1, FVBEANS, FVGREEN
+    888:   7 columns, e.g. ALCDAY5, STRENGTH, BLDSUGAR, FEETCHK2, ASACTLIM, PA1MIN_
+    999:  18 columns, e.g. ALCDAY5, FRUITJU1, FRUIT1, FVBEANS, FVGREEN, FVORANG
+   7777:   2 columns, e.g. WEIGHT2, HEIGHT3
+   9999:   2 columns, e.g. WEIGHT2, HEIGHT3
+
+============ Leak check: is missingness itself predictive? ============
+columns where 'missing or not' changes the CVD rate the most:
+  column        missing  CVD|present  CVD|missing
+  HAREHAB1        99.8%       100.0%         8.6%
+  STREHAB1        99.8%        35.8%         8.8%
+  CDHELP          99.1%        28.7%         8.6%
+  DIABAGE2        87.1%        22.1%         6.9%
+  CDDISCUS        97.1%        22.7%         8.4%
+  CDSOCIAL        97.1%        22.7%         8.4%
+  CDASSIST        97.1%        22.7%         8.4%
+  CDHOUSE         97.1%        22.7%         8.4%
+  BLDSUGAR        93.4%        21.9%         7.9%
+  DIABEYE         93.4%        21.9%         7.9%
+  DIABEDU         93.4%        21.9%         7.9%
+  INSULIN         93.4%        21.9%         7.9%
+  DOCTDIAB        93.4%        21.9%         7.9%
+  CHKHEMO3        93.4%        21.9%         7.9%
+  EYEEXAM         93.4%        21.9%         7.9%
+
+known suspects (CVD rate near 100% when present = leak):
+  column        missing  CVD|present  CVD|missing
+  HAREHAB1        99.8%       100.0%         8.6%
+  STREHAB1        99.8%        35.8%         8.8%
+  CVDASPRN        95.7%         9.4%         8.8%
+  ASPUNSAF        97.0%         4.5%         9.0%
+  RLIVPAIN        98.7%        20.8%         8.7%
+  RDUCHART        98.7%        20.8%         8.7%
+  RDUCSTRK        98.7%        20.8%         8.7%
+
+============ Key variables: value counts and CVD rate per value ============
+
+_AGEG5YR: 0.0% missing, 14 distinct values (top 12 shown)
+           9   n=  37210   CVD rate= 10.0%
+          10   n=  36665   CVD rate= 12.3%
+           8   n=  34379   CVD rate=  7.2%
+           7   n=  29693   CVD rate=  5.6%
+          11   n=  28190   CVD rate= 16.1%
+          13   n=  27066   CVD rate= 22.2%
+           6   n=  22539   CVD rate=  3.7%
+          12   n=  20893   CVD rate= 18.5%
+           5   n=  19296   CVD rate=  2.3%
+           4   n=  18308   CVD rate=  1.5%
+           1   n=  18145   CVD rate=  0.5%
+           3   n=  17122   CVD rate=  1.1%
+
+SEX: 0.0% missing, 2 distinct values
+           2   n= 189352   CVD rate=  7.1%
+           1   n= 138783   CVD rate= 11.2%
+
+GENHLTH: 0.0% missing, 7 distinct values
+           2   n= 108089   CVD rate=  4.2%
+           3   n= 101880   CVD rate=  9.1%
+           1   n=  56937   CVD rate=  2.1%
+           4   n=  43349   CVD rate= 19.3%
+           5   n=  16992   CVD rate= 31.9%
+           7   n=    562   CVD rate= 17.1%
+           9   n=    324   CVD rate= 14.2%
+         NaN   n=      2   CVD rate=  0.0%
+
+BPHIGH4: 0.0% missing, 6 distinct values
+           3   n= 189743   CVD rate=  3.7%
+           1   n= 131801   CVD rate= 16.3%
+           4   n=   3242   CVD rate=  6.0%
+           2   n=   2431   CVD rate=  3.1%
+           7   n=    616   CVD rate= 15.3%
+           9   n=    301   CVD rate=  4.3%
+         NaN   n=      1   CVD rate=  0.0%
+
+TOLDHI2: 13.3% missing, 4 distinct values
+           2   n= 163056   CVD rate=  5.2%
+           1   n= 118755   CVD rate= 16.1%
+           7   n=   2193   CVD rate= 14.0%
+           9   n=    330   CVD rate=  7.6%
+         NaN   n=  43801   CVD rate=  2.5%
+
+DIABETE3: 0.0% missing, 6 distinct values
+           3   n= 277049   CVD rate=  6.7%
+           1   n=  42223   CVD rate= 22.1%
+           4   n=   5709   CVD rate= 14.5%
+           2   n=   2675   CVD rate=  4.0%
+           7   n=    406   CVD rate= 13.1%
+           9   n=     68   CVD rate=  7.4%
+         NaN   n=      5   CVD rate= 20.0%
+
+CVDSTRK3: 0.0% missing, 4 distinct values
+           2   n= 314032   CVD rate=  7.6%
+           1   n=  13366   CVD rate= 37.1%
+           7   n=    717   CVD rate= 31.7%
+           9   n=     20   CVD rate= 25.0%
+
+_SMOKER3: 0.0% missing, 5 distinct values
+           4   n= 178357   CVD rate=  6.2%
+           3   n=  90838   CVD rate= 13.5%
+           1   n=  32444   CVD rate= 10.4%
+           9   n=  13266   CVD rate=  7.8%
+           2   n=  13230   CVD rate=  9.8%
+
+_BMI5CAT: 8.3% missing, 4 distinct values
+           3   n= 109376   CVD rate=  9.3%
+           2   n=  97813   CVD rate=  6.7%
+           4   n=  88851   CVD rate= 11.4%
+           1   n=   5022   CVD rate=  8.7%
+         NaN   n=  27073   CVD rate=  6.1%
+
+PHYSHLTH: 0.0% missing, 33 distinct values (top 12 shown)
+          88   n= 204264   CVD rate=  5.9%
+          30   n=  25233   CVD rate= 22.9%
+           2   n=  18182   CVD rate=  7.2%
+           1   n=  13676   CVD rate=  5.0%
+           3   n=  10553   CVD rate=  9.1%
+           5   n=   9207   CVD rate= 11.0%
+          10   n=   6754   CVD rate= 15.3%
+          15   n=   6150   CVD rate= 18.7%
+           7   n=   5892   CVD rate= 10.2%
+           4   n=   5672   CVD rate= 10.8%
+          77   n=   5587   CVD rate= 16.3%
+          20   n=   4033   CVD rate= 19.5%
+         NaN   n=      1   CVD rate=  0.0%
+
+============ Raw columns most correlated with the label (codes not cleaned, rough) ============
+  GENHLTH                  r=+0.244   present=100%
+  CVDASPRN                 r=-0.228   present=4%
+  _AGE80                   r=+0.225   present=100%
+  _AGEG5YR                 r=+0.219   present=100%
+  EMPLOY1                  r=+0.207   present=100%
+  _AGE_G                   r=+0.207   present=100%
+  BPHIGH4                  r=-0.205   present=100%
+  _HCVU651                 r=+0.196   present=100%
+  _AGE65YR                 r=+0.185   present=100%
+  _RFHLTH                  r=+0.172   present=100%
+  _RFHYPE5                 r=+0.171   present=100%
+  _DRDXAR1                 r=-0.168   present=99%
+  DIABETE3                 r=-0.161   present=100%
+  DRADVISE                 r=-0.143   present=9%
+  USEEQUIP                 r=-0.135   present=98%
+  DIFFWALK                 r=-0.134   present=97%
+  HAVARTH3                 r=-0.122   present=100%
+  ARTTODAY                 r=+0.120   present=4%
+  ASERVIST                 r=-0.118   present=0%
+  QLACTLM2                 r=-0.115   present=98%
+
+============ After preprocessing ============
+train (328135, 249)   test (109379, 249)   249 feature names
+NaN: 0   inf: 0
+constant columns (besides bias): []
+leak suspects that survived: none
+biggest train/test mean shifts (in train std units, > 0.1 worth a look):
+  _RACE=1                  0.010
+  _RACEG21                 0.010
+  _PRACE1=1                0.010
+  _STATE=50                0.010
+  EMPLOY1=6                0.010
+
+processed features most correlated with the label:
+  GENHLTH                  r=+0.248   present=100%
+  _RFHLTH                  r=+0.234   present=100%
+  _AGEG5YR                 r=+0.225   present=100%
+  BPHIGH4=1                r=+0.217   present=100%
+  DIFFWALK                 r=-0.212   present=100%
+  BPHIGH4=3                r=-0.210   present=100%
+  CVDSTRK3                 r=-0.206   present=100%
+  _AGE65YR                 r=+0.203   present=100%
+  TOLDHI2                  r=-0.192   present=100%
+  USEEQUIP                 r=-0.191   present=100%
+  CHCCOPD1                 r=-0.185   present=100%
+  QLACTLM2                 r=-0.184   present=100%
+  DIABETE3=1               r=+0.180   present=100%
+  PHYSHLTH                 r=+0.179   present=100%
+  _LMTSCL1                 r=-0.175   present=100%
+  PNEUVAC3                 r=-0.175   present=100%
+  DIABETE3=3               r=-0.173   present=100%
+  _LMTACT1                 r=-0.170   present=100%
+  EMPLOY1=7                r=+0.168   present=100%
+  HAVARTH3                 r=-0.167   present=100%
