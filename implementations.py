@@ -69,18 +69,15 @@ def ridge_regression(y, tx, lambda_):
 
 def sigmoid(t):
     """ Compute output of logistic (sigmoid) function on t. """
-    # (1 + e^-x)^-1
+    # (1 + e^-t)^-1
     sigma = (1 / 1 + np.exp(-t)) ** -1
     return sigma
 
 
 def calculate_neg_ll_loss(y, tx, w):
     """ Compute negative log-likelihood loss. """
-    sigma = sigmoid(np.dot(tx, w))
-    # internal negative log-likelihood calculation for each sample n
-    neg_ll = np.multiply(y, np.log(sigma)) + np.multiply(1 - y, np.log(1 - sigma))
-    # take average and make negative
-    neg_ll = np.mean(neg_ll) * -1
+    z = np.dot(tx, w)
+    neg_ll = np.mean(np.multiply(-y, z) + np.log(1 + np.exp(z)))
     return neg_ll
 
 
@@ -101,7 +98,6 @@ def learning_by_gradient_descent(y, tx, w, gamma, reg=False, lambda_=0):
     if reg:  # yes, regularize
         gradient += 2 * lambda_ * w
     w -= gamma * gradient
-    # TODO verify: compute loss after updating w? Tests fail otherwise.
     loss = calculate_neg_ll_loss(y, tx, w)
     return w, loss
 
@@ -124,6 +120,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     """ Perform logistic regression using gradient descent, with regularization term
         to help avoid overfitting. """
+    print(np.unique(y))
     w = initial_w
     loss = calculate_neg_ll_loss(
         y, tx, initial_w
