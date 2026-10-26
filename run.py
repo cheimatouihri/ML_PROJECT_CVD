@@ -6,21 +6,25 @@ from utils import (
     step_size,
     weighted_reg_logistic_regression,
     predict,
-    add_powers
+    add_powers,
+    add_interactions,
 )
 
 # parameters chosen by cross-validation
 MODEL = "weighted reg logistic"
 LAMBDA = 0.0001
 POS_WEIGHT = 2
-DEGREE = 2
-THRESHOLD = -0.680544
+DEGREE = 1
+INTERACTIONS = True
+THRESHOLD = -0.601730         #THRESHOLD = -0.680544
 MAX_ITERS = 1000   
 OUTPUT = "submission.csv"
 
 tx_train, tx_test, y_train, test_ids, features = load_preprocess(use_cache=False)
 if DEGREE > 1:
     tx_train, tx_test, features = add_powers(tx_train, features, DEGREE, tx_test)
+if INTERACTIONS:
+    tx_train, tx_test, features = add_interactions(tx_train, features, tx_te=tx_test)
 y01 = (y_train == 1).astype(float) # convert labels to 0/1 for logistic regression
 w0 = np.zeros(tx_train.shape[1])
 

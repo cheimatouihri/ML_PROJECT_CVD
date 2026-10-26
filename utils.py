@@ -5,6 +5,26 @@ from preprocessing import preprocess
 from implementations import sigmoid
 
 DATA_DIR = "data"
+INTERACTION_FEATURES = [
+    "_AGEG5YR",
+    "SEX",
+    "GENHLTH",
+    "PHYSHLTH",
+    "_BMI5",
+    "_RFHYPE5",
+    "BPHIGH4=1",
+    "TOLDHI2",
+    "DIABETE3=1",
+    "_SMOKER3",
+    "CVDSTRK3",
+    "CHCCOPD1",
+    "CHCKIDNY",
+    "DIFFWALK",
+    "USEEQUIP",
+    "QLACTLM2",
+    "HAVARTH3",
+    "EMPLOY1=7",
+]
 
 def load_preprocess(use_cache=True):
     """Return tx_train, tx_test, y_train (labels -1/1), test_ids, feature names.
@@ -113,3 +133,32 @@ def add_powers(tx_tr, features, degree, tx_te=None):
         names += [f"{features[j]}^{p}" for j in cols]
     tx_te_poly = np.hstack(parts_te) if tx_te is not None else None
     return np.hstack(parts_tr), tx_te_poly, names
+
+# Features combined pairwise by add_interactions(): age, sex, general health and the main
+# cardiovascular risk factors / comorbidities (chosen from the EDA). Names missing after
+# preprocessing are skipped.
+
+def add_interactions(tx_tr, features, names=INTERACTION_FEATURES, tx_te=None):
+    """Interaction features: the product x_i * x_j for every pair of the listed features.
+
+    A linear model can then learn effects that depend on another feature, e.g. that high
+    blood pressure matters more at older ages. Each product is standardized with the mean /
+    std of the training data.
+
+    Returns:
+        tx_tr_inter, tx_te_inter (None if tx_te is None), new feature names
+    """
+    idx = [features.index(n) for n in names if n in features]
+    parts_tr, parts_te, new_names = [tx_tr], [tx_te], list(features)
+    for a in range(len(idx)):
+        for b in range(a + 1, len(idx)):
+            i, j = idx[a], idx[b]
+            prod_tr = tx_tr[:, i] * tx_tr[:, j]
+            mean, std = prod_tr.mean(), prod_tr.std()
+            std = std if std > 0 else 1.0
+            parts_tr.append(((prod_tr - mean) / std)[:, None])
+            if tx_te is not None:
+                parts_te.append(((tx_te[:, i] * tx_te[:, j] - mean) / std)[:, None])
+            new_names.append(f"{features[i]}*{features[j]}")
+    tx_te_inter = np.hstack(parts_te) if tx_te is not None else None
+    return np.hstack(parts_tr), tx_te_inter, new_names
