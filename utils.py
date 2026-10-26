@@ -75,6 +75,7 @@ def step_size(tx, loss, lambda_=0.0, y01=None, pos_weight=1.0, iters=30, seed=0)
         raise ValueError(f"unknown loss {loss!r}")
     return 1 / (curvature + 2 * lambda_)
 
+
 def weighted_reg_logistic_regression(
     y, tx, lambda_, initial_w, max_iters, gamma, pos_weight
 ):
