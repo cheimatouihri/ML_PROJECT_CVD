@@ -13,9 +13,9 @@ from utils import (
 MODEL = "weighted reg logistic"
 LAMBDA = 0.0001
 POS_WEIGHT = 2
-DEGREE = [2]
-THRESHOLD = -0.721576
-MAX_ITERS = 1000  
+DEGREE = 2
+THRESHOLD = -0.680544
+MAX_ITERS = 1000   
 OUTPUT = "submission.csv"
 
 tx_train, tx_test, y_train, test_ids, features = load_preprocess(use_cache=False)
