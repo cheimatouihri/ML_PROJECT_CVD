@@ -5,7 +5,7 @@ TO_REMOVE = ["FMONTH", "IDATE", "IMONTH", "IDAY", "IYEAR", "SEQNO", "_PSU",
              "_STSTR", "_STRWT", "_RAWRAKE", "_WT2RAKE", "_CLLCPWT", "_DUALCOR", "_LLCPWT",
              "WEIGHT2", "HEIGHT3", "ALCDAY5", "FRUITJU1", "FRUIT1", "FVBEANS", "FVGREEN",
              "FVORANG", "VEGETAB1", "EXEROFT1", "EXERHMM1", "EXEROFT2", "EXERHMM2", "STRENGTH",
-             "FLSHTMY2", "HIVTSTD3", "EXRACT11", "EXRACT21", "HAREHAB1"]
+             "FLSHTMY2", "HIVTSTD3", "EXRACT11", "EXRACT21", "HAREHAB1",]
 
 # codes that are not 7/9 and represent unknown value
 EXTRA_CODES = {"_AGEG5YR": [14], "_AGE65YR": [3], "DROCDY3_": [900], "_DRNKWEK": [99900],
