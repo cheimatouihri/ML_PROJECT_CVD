@@ -95,6 +95,24 @@ def step_size(tx, loss, lambda_=0.0, y01=None, pos_weight=1.0, iters=30, seed=0)
         raise ValueError(f"unknown loss {loss!r}")
     return 1 / (curvature + 2 * lambda_)
 
+def random_undersample(x, y, und_ratio, seed):
+    """Randomly undersample the majority class to reduce class imbalance.
+
+    Keeps all minority samples plus und_ratio * (number of minority samples) majority
+    samples drawn at random without replacement (capped at the size of the majority
+    class). und_ratio = 1 gives a balanced dataset.
+    """
+    rng = np.random.default_rng(seed)
+    labels, counts = np.unique(y, return_counts=True)
+    min_label = labels[counts.argmin()]
+    min_indices = np.where(y == min_label)[0]
+    maj_indices = np.where(y != min_label)[0]
+
+    n_keep = min(int(und_ratio * len(min_indices)), len(maj_indices))
+    maj_keep = rng.choice(maj_indices, n_keep, replace=False)
+
+    idx = rng.permutation(np.concatenate([maj_keep, min_indices]))
+    return x[idx], y[idx]
 
 def weighted_reg_logistic_regression(
     y, tx, lambda_, initial_w, max_iters, gamma, pos_weight
