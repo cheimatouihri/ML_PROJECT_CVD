@@ -76,7 +76,7 @@ def step_size(tx, loss, lambda_=0.0, y01=None, pos_weight=1.0, iters=30, seed=0)
     """
     v = np.random.default_rng(seed).normal(size=tx.shape[1])
     
-    for _ in range(iters):  # power iteration
+    for _ in range(iters):  
         v = tx.T @ (tx @ v) / len(tx)
         L = np.linalg.norm(v)
         v /= L
@@ -135,8 +135,8 @@ def add_powers(tx_tr, features, degree, tx_te=None):
     return np.hstack(parts_tr), tx_te_poly, names
 
 # Features combined pairwise by add_interactions(): age, sex, general health and the main
-# cardiovascular risk factors / comorbidities (chosen from the EDA). Names missing after
-# preprocessing are skipped.
+# cardiovascular risk factors / comorbidities (chosen from the EDA). 
+# Names missing after preprocessing are skipped.
 
 def add_interactions(tx_tr, features, names=INTERACTION_FEATURES, tx_te=None):
     """Interaction features: the product x_i * x_j for every pair of the listed features.

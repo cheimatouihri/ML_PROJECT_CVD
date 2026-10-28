@@ -13,7 +13,7 @@ y = (y_train == 1).astype(float)
 
 
 def replace_codes(x, names):
-    """Same rules as preprocess(): 7s/9s -> NaN (don't know / refused), 88 -> 0 (none),
+    """ 7s/9s -> NaN (don't know / refused), 88 -> 0 (none),
     calculated variables (_X, X_) only lose a 1-digit 9, plus the EXTRA_CODES."""
     x = x.copy()
     for c, name in enumerate(names):
@@ -44,10 +44,9 @@ def calculate_corr(v):
 X = replace_codes(x_train, names)
 missing = np.isnan(X).mean(axis=0)
 n_unique = np.array([len(np.unique(column[~np.isnan(column)])) for column in X.T])
-nominal = np.isin(names, NOMINAL) & ~np.isin(names, ["DIABETE3", "BPHIGH4"])  # code order is meaningless, so r is too
+nominal = np.isin(names, NOMINAL) & ~np.isin(names, ["DIABETE3", "BPHIGH4"]) 
 corr = np.array([calculate_corr(column) for column in X.T])
 
-# does "missing or not" predict the label? (the model sees this through the _missing indicators)
 partly = (missing > 0.01) & (missing < 0.99)
 miss_corr = np.array([np.corrcoef(np.isnan(column), y)[0, 1] if p else 0 for column, p in zip(X.T, partly)])
 
@@ -56,7 +55,7 @@ print(f"positives: {y.mean():.1%}  (always predicting 'no' gives {1 - y.mean():.
 print("features with survey codes:", int((missing > np.isnan(x_train).mean(axis=0)).sum()))
 print("features missing > 50% / 80%:", int((missing > 0.5).sum()), "/", int((missing > 0.8).sum()))
 print("constant:", int((n_unique <= 1).sum()), " binary:", int((n_unique == 2).sum()),
-      " discrete (3-15):", int(((n_unique > 2) & (n_unique <= 15)).sum()), " continuous:", int((n_unique > 15).sum()))  # fmt: skip
+      " discrete (3-15):", int(((n_unique > 2) & (n_unique <= 15)).sum()), " continuous:", int((n_unique > 15).sum())) 
 
 top = np.argsort(-np.abs(np.where((missing < 0.5) & ~nominal, corr, 0)))[:15]
 print("\ntop 15 features (< 50% missing, not nominal) by correlation with the label:")
@@ -92,14 +91,12 @@ def rate_plot(a, values, title, labels=None):
     rates = [y[present][values[present] == cat].mean() * 100 for cat in cats]
     ticks = labels if labels is not None and len(labels) == len(cats) else [f"{cat:g}" for cat in cats]
     a.bar(range(len(cats)), rates, color="tab:red", alpha=0.8)
-    #a.axhline(y.mean() * 100, color="black", linestyle="--", linewidth=0.8, label="overall rate")
     a.set_xticks(range(len(cats)), ticks, rotation=45 if len(cats) > 6 else 0, ha="right" if len(cats) > 6 else "center")
     a.set_ylabel("CVD rate (%)")
     a.set_title(title)
-    a.legend()
 
 
-# risk-factor count: people with an unknown answer are left out
+# risk-factor count
 factors = {"_RFHYPE5": 2,   # high blood pressure (2 = yes)
            "_RFCHOL": 2,    # high cholesterol
            "DIABETE3": 1,   # diabetes (1 = yes)
@@ -115,10 +112,10 @@ ages = ["18-24"] + [f"{a}-{a + 4}" for a in range(25, 80, 5)] + ["80+"]
 fig, ax = plt.subplots(2, 2, figsize=(12, 8))
 rate_plot(ax[0, 0], X[:, col["_AGEG5YR"]], "CVD rate by age group", ages)
 rate_plot(ax[0, 1], X[:, col["GENHLTH"]], "CVD rate by self-rated health",
-          ["excellent", "very good", "good", "fair", "poor"])  # fmt: skip
+          ["excellent", "very good", "good", "fair", "poor"])
 rate_plot(ax[1, 0], risk, "CVD rate by number of risk factors\n(hypertension, cholesterol, diabetes, smoking, obesity, inactivity)")
 rate_plot(ax[1, 1], X[:, col["DIABETE3"]], "CVD rate by DIABETE3 code (not ordinal)",
-          ["yes", "pregnancy only", "no", "prediabetes"])  # fmt: skip
+          ["yes", "pregnancy only", "no", "prediabetes"]) 
 fig.tight_layout()
 fig.savefig("eda_output/cvd_rates.png", dpi=150)
 print("\nsaved eda_output/eda.png and eda_output/cvd_rates.png")
