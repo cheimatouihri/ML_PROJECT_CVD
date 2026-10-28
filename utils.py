@@ -180,3 +180,33 @@ def add_interactions(tx_tr, features, names=INTERACTION_FEATURES, tx_te=None):
             new_names.append(f"{features[i]}*{features[j]}")
     tx_te_inter = np.hstack(parts_te) if tx_te is not None else None
     return np.hstack(parts_tr), tx_te_inter, new_names
+
+
+def random_undersample(x, y, und_ratio, seed):
+    """ Randomly undersample the data to even out class imbalance:
+        Randomly select only m samples from the MAJORITY class, where m equals the
+        total number of samples in the dataset from the MINORITY class
+    """
+    labels, counts = np.unique(y, return_counts=True)
+    m = counts.min()  # count of data points in minority class
+    min_label = labels[counts.argmin()]  # minority class label
+    maj_indices = np.where(y != min_label)[0]  # indices for data points in majority class
+    min_indices = np.where(y == min_label)[0]  # indices for data points in minority class
+    x_maj_only = x[maj_indices]  # dataset filtered for majority class only
+    y_maj_only = y[maj_indices]  # dataset filtered for majority class only
+    x_min_only = x[min_indices]  # dataset filtered for minority class only
+    y_min_only = y[min_indices]  # dataset filtered for minority class only
+    # create ndarray of randomized indices for undersampling
+    # use argument for ratio of majority class labels to 1 minority class label
+    und_rand_idx = np.random.permutation(m * und_ratio)
+    # undersample majority class data points using randomly generated indices
+    x_und = x_maj_only[und_rand_idx]
+    y_und = y_maj_only[und_rand_idx]
+
+    # randomly generate indices for final reshuffle
+    recombine_rand_idx = np.random.permutation(und_rand_idx.shape[0] + m)
+    # recombine with data points from the minority class
+    x_recombine = np.concatenate([x_und, x_min_only])
+    y_recombine = np.concatenate([y_und, y_min_only])
+
+    return x_recombine[recombine_rand_idx], y_recombine[recombine_rand_idx]
