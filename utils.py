@@ -26,6 +26,7 @@ INTERACTION_FEATURES = [
     "EMPLOY1=7",
 ]
 
+
 def load_preprocess(use_cache=True):
     """Return tx_train, tx_test, y_train (labels -1/1), test_ids, feature names.
     """
@@ -33,6 +34,7 @@ def load_preprocess(use_cache=True):
     names = open(f"{DATA_DIR}/x_train.csv").readline().strip().split(",")[1:]
     tx_train, tx_test, features = preprocess(x_train, x_test, names)
     return tx_train, tx_test, y_train, test_ids, features
+
 
 def build_k_indices(y, k_fold, seed):
     """Build k indices for k-fold (from lab 4).
@@ -53,6 +55,7 @@ def build_k_indices(y, k_fold, seed):
     k_indices = [indices[k * interval : (k + 1) * interval] for k in range(k_fold)]
     return np.array(k_indices)
 
+
 def f1_score(y_true, y_pred):
     """F1 score of the positive class (1)."""
     tp = np.sum((y_pred == 1) & (y_true == 1))
@@ -60,9 +63,11 @@ def f1_score(y_true, y_pred):
     fn = np.sum((y_pred != 1) & (y_true == 1))
     return 2 * tp / (2 * tp + fp + fn) if tp > 0 else 0.0
 
+
 def predict(scores, threshold):
     """Labels -1/1 from model scores (tx @ w): 1 if the score is above the threshold."""
     return np.where(scores > threshold, 1, -1)
+
 
 def threshold_curve(scores, y):
     """F1 for a range of thresholds
@@ -70,6 +75,7 @@ def threshold_curve(scores, y):
     """
     thresholds = np.quantile(scores, np.linspace(0.50, 0.99, 99))
     return thresholds, np.array([f1_score(y, predict(scores, t)) for t in thresholds])
+
 
 def step_size(tx, loss, lambda_=0.0, y01=None, pos_weight=1.0, iters=30, seed=0):
     """Safe gradient descent step size: gamma = 1 / (largest curvature of the loss).
@@ -95,6 +101,7 @@ def step_size(tx, loss, lambda_=0.0, y01=None, pos_weight=1.0, iters=30, seed=0)
         raise ValueError(f"unknown loss {loss!r}")
     return 1 / (curvature + 2 * lambda_)
 
+
 def random_undersample(x, y, und_ratio, seed):
     """Randomly undersample the majority class to reduce class imbalance.
 
@@ -114,6 +121,7 @@ def random_undersample(x, y, und_ratio, seed):
     idx = rng.permutation(np.concatenate([maj_keep, min_indices]))
     return x[idx], y[idx]
 
+
 def weighted_reg_logistic_regression(
     y, tx, lambda_, initial_w, max_iters, gamma, pos_weight
 ):
@@ -128,6 +136,7 @@ def weighted_reg_logistic_regression(
         gradient = tx.T @ (c * (sigmoid(tx @ w) - y)) / len(y) + 2 * lambda_ * w
         w = w - gamma * gradient
     return w
+
 
 def add_powers(tx_tr, features, degree, tx_te=None):
     """Polynomial feature expansion (as build_poly in lab 4), only for non-binary columns.
@@ -152,10 +161,10 @@ def add_powers(tx_tr, features, degree, tx_te=None):
     tx_te_poly = np.hstack(parts_te) if tx_te is not None else None
     return np.hstack(parts_tr), tx_te_poly, names
 
+
 # Features combined pairwise by add_interactions(): age, sex, general health and the main
 # cardiovascular risk factors / comorbidities (chosen from the EDA). 
 # Names missing after preprocessing are skipped.
-
 def add_interactions(tx_tr, features, names=INTERACTION_FEATURES, tx_te=None):
     """Interaction features: the product x_i * x_j for every pair of the listed features.
 
@@ -180,33 +189,3 @@ def add_interactions(tx_tr, features, names=INTERACTION_FEATURES, tx_te=None):
             new_names.append(f"{features[i]}*{features[j]}")
     tx_te_inter = np.hstack(parts_te) if tx_te is not None else None
     return np.hstack(parts_tr), tx_te_inter, new_names
-
-
-def random_undersample(x, y, und_ratio, seed):
-    """ Randomly undersample the data to even out class imbalance:
-        Randomly select only m samples from the MAJORITY class, where m equals the
-        total number of samples in the dataset from the MINORITY class
-    """
-    labels, counts = np.unique(y, return_counts=True)
-    m = counts.min()  # count of data points in minority class
-    min_label = labels[counts.argmin()]  # minority class label
-    maj_indices = np.where(y != min_label)[0]  # indices for data points in majority class
-    min_indices = np.where(y == min_label)[0]  # indices for data points in minority class
-    x_maj_only = x[maj_indices]  # dataset filtered for majority class only
-    y_maj_only = y[maj_indices]  # dataset filtered for majority class only
-    x_min_only = x[min_indices]  # dataset filtered for minority class only
-    y_min_only = y[min_indices]  # dataset filtered for minority class only
-    # create ndarray of randomized indices for undersampling
-    # use argument for ratio of majority class labels to 1 minority class label
-    und_rand_idx = np.random.permutation(m * und_ratio)
-    # undersample majority class data points using randomly generated indices
-    x_und = x_maj_only[und_rand_idx]
-    y_und = y_maj_only[und_rand_idx]
-
-    # randomly generate indices for final reshuffle
-    recombine_rand_idx = np.random.permutation(und_rand_idx.shape[0] + m)
-    # recombine with data points from the minority class
-    x_recombine = np.concatenate([x_und, x_min_only])
-    y_recombine = np.concatenate([y_und, y_min_only])
-
-    return x_recombine[recombine_rand_idx], y_recombine[recombine_rand_idx]
